@@ -1,0 +1,34 @@
+# MySQL + API for local development:  docker compose up --build
+# (MySQL + API para desarrollo local)
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: smartstock
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: SmartStock.Platform.API/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Default: "Server=mysql;Port=3306;Database=smartstock;User=root;Password=root;"
+      Jwt__Secret: "local-development-secret-with-more-than-32-characters"
+      Database__SeedDemoData: "true"
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql-data:
