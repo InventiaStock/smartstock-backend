@@ -26,9 +26,7 @@ public static class SharedKernelExtensions
 {
     public static IServiceCollection AddSharedKernel(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
-        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
 
         var connectionString = configuration.GetConnectionString("Default")
             ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
@@ -52,9 +50,9 @@ public static class SharedKernelExtensions
     }
 
     /// <summary>
-    /// Creates the tables and, in development, the demo data.
-    /// Database:UseMigrations = false -> EnsureCreated (while the model changes every day).
-    /// Database:UseMigrations = true  -> Migrate (final version, after the InitialCreate migration).
+    /// Creates the tables with the migrations (Migrate) and, if configured, the demo data.
+    /// The InitialCreate migration lives in Shared/Infrastructure/Migrations.
+    /// (Crea las tablas con las migraciones y, si se configura, los datos demo.)
     /// </summary>
     public static async Task InitializeDatabaseAsync(this WebApplication app)
     {
@@ -64,10 +62,7 @@ public static class SharedKernelExtensions
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        if (configuration.GetValue("Database:UseMigrations", false))
-            await db.Database.MigrateAsync();
-        else
-            await db.Database.EnsureCreatedAsync();
+        await db.Database.MigrateAsync();
 
         if (!configuration.GetValue("Database:SeedDemoData", false)) return;
 
