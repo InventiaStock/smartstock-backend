@@ -1,53 +1,31 @@
 namespace SmartStock.Platform.API.Shared.Infrastructure;
 
-/// <summary>Names of the claims inside the JWT. (Nombres de los claims del JWT.)</summary>
-public static class AuthClaims
-{
-    public const string UserId = "uid";
-    public const string BusinessId = "bid";
-    public const string Email = "email";
-    public const string BusinessType = "btype";
-}
-
-public class JwtSettings
-{
-    public string Secret { get; set; } = string.Empty;   // at least 32 characters (mínimo 32 caracteres)
-    public string Issuer { get; set; } = "SmartStock";
-    public string Audience { get; set; } = "SmartStockWeb";
-    public int ExpiresMinutes { get; set; } = 480;
-}
-
-/// <summary>The logged user of the current request. (El usuario autenticado de la solicitud.)</summary>
+/// <summary>
+/// The current user of the request. By indication of the professor the endpoints are open for now
+/// (no login, no token), so every request works as ONE fixed business (id 1 by default).
+/// (Por ahora los endpoints van abiertos: toda solicitud trabaja como un negocio fijo, el id 1.)
+/// </summary>
 public interface ICurrentUser
 {
-    bool IsAuthenticated { get; }
-    long UserId { get; }
     long BusinessId { get; }
+
+    /// <summary>Email of the default notification channel (Notifications:DefaultEmail).</summary>
     string? Email { get; }
 
     /// <summary>
-    /// For requests without token (the IoT devices): after finding the sensor, work as its business.
-    /// (Para solicitudes sin token, como los sensores: trabajar como el negocio del sensor.)
+    /// For the IoT devices: after finding the sensor, work as its business.
+    /// (Para los sensores: trabajar como el negocio del sensor.)
     /// </summary>
     void UseBusiness(long businessId);
 }
 
-public class CurrentUser(IHttpContextAccessor accessor) : ICurrentUser
+public class CurrentUser(IConfiguration configuration) : ICurrentUser
 {
     private long? _businessOverride;
 
-    private System.Security.Claims.ClaimsPrincipal? Principal => accessor.HttpContext?.User;
+    public long BusinessId => _businessOverride ?? configuration.GetValue("Tenant:DefaultBusinessId", 1L);
 
-    public bool IsAuthenticated => Principal?.Identity?.IsAuthenticated == true;
-
-    public long UserId => ReadLong(AuthClaims.UserId);
-
-    public long BusinessId => _businessOverride ?? ReadLong(AuthClaims.BusinessId);
-
-    public string? Email => Principal?.FindFirst(AuthClaims.Email)?.Value;
+    public string? Email => configuration["Notifications:DefaultEmail"];
 
     public void UseBusiness(long businessId) => _businessOverride = businessId;
-
-    private long ReadLong(string claimType) =>
-        long.TryParse(Principal?.FindFirst(claimType)?.Value, out var value) ? value : 0;
 }
