@@ -1,8 +1,15 @@
 namespace SmartStock.Platform.API.IAM;
 
-// OWNER: Lorena. Replace this file with the final one from your guide.
-// (Reemplaza este archivo por el definitivo de tu guía.)
 public static class IamModule
 {
-    public static IServiceCollection AddIamModule(this IServiceCollection services) => services;
+    public static IServiceCollection AddIamModule(this IServiceCollection services)
+    {
+        // Only persistence for now: login, register and forgot-password are Sprint 4.
+        // (Solo persistencia: login, registro y recuperar contraseña pasan al Sprint 4.)
+        services.AddScoped<IBusinessRepository, BusinessRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
+        services.AddScoped<IDemoSeeder, IamDemoSeeder>();
+        return services;
+    }
 }
