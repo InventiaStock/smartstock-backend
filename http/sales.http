@@ -1,0 +1,35 @@
+### Owner: Lorena  ·  TS07, TS08 sales
+@baseUrl = http://localhost:5000/api
+
+### Register a sale -> 201 { "id": "R-00042" }
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{ "items": [ { "productoId": 3, "cantidad": 2, "precioUnitario": 5.5 } ] }
+
+### More than the stock -> 422 INSUFFICIENT_STOCK (R13)
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{ "items": [ { "productoId": 1, "cantidad": 999, "precioUnitario": 8.2 } ] }
+
+### Product without sale price (Flour, id 5) -> 422 NO_SALE_PRICE (R14)
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{ "items": [ { "productoId": 5, "cantidad": 1, "precioUnitario": 3 } ] }
+
+### Without items -> 400 NO_ITEMS
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{ "items": [] }
+
+### History of the month (Historial del mes)
+GET {{baseUrl}}/ventas?desde=2026-11-01&hasta=2026-11-30
+
+### Detail (with its stock movements)
+GET {{baseUrl}}/ventas/R-00041
+
+### Does not exist -> 404
+GET {{baseUrl}}/ventas/R-99999
