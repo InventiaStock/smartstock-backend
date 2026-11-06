@@ -1,3 +1,4 @@
+using SmartStock.Platform.API.ProductCatalog;
 namespace SmartStock.Platform.API.InventoryMonitoring.Sales;
 
 public class SaleConfiguration : IEntityTypeConfiguration<Sale>
@@ -53,6 +54,8 @@ public class SaleDemoSeeder : IDemoSeeder
         var businessId = context.MinimarketBusinessId;
         if (businessId == 0 || await db.Set<Sale>().IgnoreQueryFilters().AnyAsync(s => s.BusinessId == businessId)) return;
 
+        // The demo sale needs the demo products (they arrive with the catalog). (Necesita los productos demo.)
+        if (!await db.Set<Product>().IgnoreQueryFilters().AnyAsync(p => p.BusinessId == businessId)) return;
         var sale = new Sale(41, Clock.Today,
         [
             new SaleItem(3, 3, 5.5m),
