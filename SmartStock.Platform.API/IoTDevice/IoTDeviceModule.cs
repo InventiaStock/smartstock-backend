@@ -1,8 +1,14 @@
 namespace SmartStock.Platform.API.IoTDevice;
 
-// OWNER: Ruth. Replace this file with the final one from your guide.
-// (Reemplaza este archivo por el definitivo de tu guía.)
 public static class IoTDeviceModule
 {
-    public static IServiceCollection AddIoTDeviceModule(this IServiceCollection services) => services;
+    public static IServiceCollection AddIoTDeviceModule(this IServiceCollection services)
+    {
+        services.AddScoped<ISensorRepository, SensorRepository>();
+        services.AddScoped<ISensorCommandService, SensorCommandService>();
+        services.AddScoped<ISensorQueryService, SensorQueryService>();
+        services.AddScoped<IIoTDeviceFacade, IoTDeviceFacade>();   // replaces the stub (reemplaza el stub)
+        services.AddScoped<IDemoSeeder, SensorDemoSeeder>();
+        return services;
+    }
 }
