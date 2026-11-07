@@ -1,8 +1,20 @@
 namespace SmartStock.Platform.API.ProductCatalog;
 
-// OWNER: Candy. Replace this file with the final one from your guide.
-// (Reemplaza este archivo por el definitivo de tu guía.)
 public static class ProductCatalogModule
 {
-    public static IServiceCollection AddProductCatalogModule(this IServiceCollection services) => services;
+    public static IServiceCollection AddProductCatalogModule(
+        this IServiceCollection services)
+    {
+        services.AddScoped<IProductRepository, ProductRepository>();
+
+        services.AddScoped<IProductCommandService, ProductCommandService>();
+
+        services.AddScoped<IProductQueryService, ProductQueryService>();
+
+        services.AddScoped<IProductCatalogFacade, ProductCatalogFacade>();
+
+        services.AddScoped<IDemoSeeder, ProductDemoSeeder>();
+
+        return services;
+    }
 }
