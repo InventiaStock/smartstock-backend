@@ -1,8 +1,21 @@
 namespace SmartStock.Platform.API.AlertsRestocking;
 
-// OWNER: Leo. Replace this file with the final one from your guide.
-// (Reemplaza este archivo por el definitivo de tu guía.)
 public static class AlertsRestockingModule
 {
-    public static IServiceCollection AddAlertsRestockingModule(this IServiceCollection services, IConfiguration configuration) => services;
+    public static IServiceCollection AddAlertsRestockingModule(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddScoped<IAlertRepository, AlertRepository>();
+        services.AddScoped<IRestockingNeedRepository, RestockingNeedRepository>();
+        services.AddScoped<INotificationChannelRepository, NotificationChannelRepository>();
+        services.AddScoped<ISentNotificationRepository, SentNotificationRepository>();
+
+        services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+        services.AddScoped<IAlertsFacade, AlertsFacade>();
+        services.AddScoped<IAlertQueryService, AlertQueryService>();
+        services.AddScoped<INotificationService, NotificationService>();
+
+        return services;
+    }
 }
