@@ -1,8 +1,24 @@
 namespace SmartStock.Platform.API.InventoryMonitoring.Procurement;
 
-// OWNER: Candy. Replace this file with the final one from your guide.
-// (Reemplaza este archivo por el definitivo de tu guía.)
 public static class ProcurementFeature
 {
-    public static IServiceCollection AddProcurementFeature(this IServiceCollection services) => services;
+    public static IServiceCollection AddProcurementFeature(
+        this IServiceCollection services)
+    {
+        services.AddScoped<ISupplierRepository, SupplierRepository>();
+
+        services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+
+        services.AddScoped<ISupplierService, SupplierService>();
+
+        services.AddScoped<IPurchaseCommandService, PurchaseCommandService>();
+
+        services.AddScoped<IPurchaseQueryService, PurchaseQueryService>();
+
+        services.AddScoped<IProcurementFacade, ProcurementFacade>();
+
+        services.AddScoped<IDemoSeeder, ProcurementDemoSeeder>();
+
+        return services;
+    }
 }
