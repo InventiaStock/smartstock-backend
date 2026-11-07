@@ -1,0 +1,125 @@
+﻿
+### SmartStock WEB AV2 - Sprint 3
+### Owner: Candy
+### TS09 - Suppliers
+### TS10 - Register Purchase
+### TS11 - Receive Purchase
+### TS12 - Purchase History
+
+@baseUrl = http://localhost:5000/api
+
+
+### E13 - Listar proveedores
+### Respuesta esperada: 200 OK
+GET {{baseUrl}}/proveedores
+
+
+### E12 - Registrar proveedor
+### Respuesta esperada: 201 Created
+POST {{baseUrl}}/proveedores
+Content-Type: application/json
+
+{
+  "nombre": "Distribuidora Sol",
+  "telefono": "987654321",
+  "correo": "ventas@sol.pe"
+}
+
+
+### E12 - Proveedor duplicado (R8)
+### Respuesta esperada: 409 DUPLICATE_SUPPLIER
+### Ejecutar despues de registrar Distribuidora Sol
+POST {{baseUrl}}/proveedores
+Content-Type: application/json
+
+{
+  "nombre": "distribuidora sol",
+  "telefono": "987 654 321"
+}
+
+
+### E12 - Proveedor sin telefono
+### Respuesta esperada: 400 INCOMPLETE
+POST {{baseUrl}}/proveedores
+Content-Type: application/json
+
+{
+  "nombre": "Sin telefono"
+}
+
+
+### E14 - Registrar compra
+### Respuesta esperada: 201 Created
+### R15: La compra inicia PENDING y no modifica stock
+POST {{baseUrl}}/compras
+Content-Type: application/json
+
+{
+  "proveedorId": 1,
+  "items": [
+    {
+      "productoId": 1,
+      "cantidad": 24,
+      "costoUnitario": 2.5
+    }
+  ]
+}
+
+
+### E14 - Registrar compra desde una alerta
+### Regla R21
+### Ejecutar solo si existe restockingNeedId = 1
+POST {{baseUrl}}/compras
+Content-Type: application/json
+
+{
+  "proveedorId": 1,
+  "restockingNeedId": 1,
+  "items": [
+    {
+      "productoId": 1,
+      "cantidad": 20,
+      "costoUnitario": 6.5
+    }
+  ]
+}
+
+
+### E14 - Proveedor inexistente
+### Respuesta esperada: 404 SUPPLIER_NOT_FOUND
+POST {{baseUrl}}/compras
+Content-Type: application/json
+
+{
+  "proveedorId": 999,
+  "items": [
+    {
+      "productoId": 1,
+      "cantidad": 1,
+      "costoUnitario": 1
+    }
+  ]
+}
+
+
+### E15 - Recibir compra
+### Respuesta esperada: 200 OK
+### R16: Aumenta el stock mediante movimientos IN
+### Usar solo en la base de datos local de pruebas
+PATCH {{baseUrl}}/compras/PO-00031/recepcion
+
+
+### E15 - Recibir nuevamente la misma compra
+### Respuesta esperada: 409 ALREADY_RECEIVED
+### Ejecutar despues de la recepcion anterior
+PATCH {{baseUrl}}/compras/PO-00031/recepcion
+
+
+### E16 - Historial de compras (Nivel 2)
+### Respuesta esperada: 200 OK
+GET {{baseUrl}}/compras?desde=2026-11-01&hasta=2026-11-30
+
+
+### E17 - Detalle de compra (Nivel 2)
+### Respuesta esperada: 200 OK
+GET {{baseUrl}}/compras/PO-00031
