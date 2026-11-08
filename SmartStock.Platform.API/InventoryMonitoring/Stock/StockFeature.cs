@@ -1,8 +1,13 @@
 namespace SmartStock.Platform.API.InventoryMonitoring.Stock;
 
-// OWNER: Geraldine. Replace this file with the final one from your guide.
-// (Reemplaza este archivo por el definitivo de tu guía.)
 public static class StockFeature
 {
-    public static IServiceCollection AddStockFeature(this IServiceCollection services) => services;
+    public static IServiceCollection AddStockFeature(this IServiceCollection services)
+    {
+        services.AddScoped<IStockMovementRepository, StockMovementRepository>();
+        services.AddScoped<IStockMovementFacade, StockMovementFacade>();   // replaces the stub (reemplaza el stub)
+        services.AddScoped<IStockQueryService, StockQueryService>();
+        services.AddScoped<IDemoSeeder, StockMovementDemoSeeder>();
+        return services;
+    }
 }
