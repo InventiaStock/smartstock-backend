@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStock.Platform.API", "SmartStock.Platform.API\SmartStock.Platform.API.csproj", "{72F710FC-8919-46F0-90A0-B75E6287BF54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStock.Platform.API.Tests", "SmartStock.Platform.API.Tests\SmartStock.Platform.API.Tests.csproj", "{76D04EA9-0DDC-4C72-AA64-022A3E793442}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{72F710FC-8919-46F0-90A0-B75E6287BF54}.Release|x64.Build.0 = Release|Any CPU
 		{72F710FC-8919-46F0-90A0-B75E6287BF54}.Release|x86.ActiveCfg = Release|Any CPU
 		{72F710FC-8919-46F0-90A0-B75E6287BF54}.Release|x86.Build.0 = Release|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Debug|x64.Build.0 = Debug|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Debug|x86.Build.0 = Debug|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Release|x64.ActiveCfg = Release|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Release|x64.Build.0 = Release|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Release|x86.ActiveCfg = Release|Any CPU
+		{76D04EA9-0DDC-4C72-AA64-022A3E793442}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
