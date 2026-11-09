@@ -1,0 +1,23 @@
+### Owner: Geraldine  ·  TS02, TS06, TS15 and product detail
+@baseUrl = http://localhost:5000/api
+
+### TS02 stock of a product
+GET {{baseUrl}}/productos/1/stock
+
+### Detail: product + sensor + last 5 readings
+GET {{baseUrl}}/productos/3/detalle
+
+### TS06 comparison of every product (MATCH / DISCREPANCY / REGISTERED_ONLY)
+GET {{baseUrl}}/inventario/comparacion
+
+### TS06 comparison of one product
+GET {{baseUrl}}/inventario/comparacion/3
+
+### Product that does not exist -> 404
+GET {{baseUrl}}/inventario/comparacion/999
+
+### TS15 movements of a period
+GET {{baseUrl}}/movimientos-stock?desde=2026-11-01&hasta=2026-11-30
+
+### Period without movements -> 200 and []
+GET {{baseUrl}}/movimientos-stock?desde=2020-01-01&hasta=2020-01-31
