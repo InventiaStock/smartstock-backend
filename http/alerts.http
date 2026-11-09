@@ -1,0 +1,10 @@
+### Owner: Leo — Wave 1
+@baseUrl = http://localhost:5000/api
+
+### E30 — List active alerts and alerts resolved in the last 24 hours
+GET {{baseUrl}}/alertas
+Accept: application/json
+
+### E31 — List notification channels
+GET {{baseUrl}}/canales-notificacion
+Accept: application/json
