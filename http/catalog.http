@@ -1,0 +1,70 @@
+﻿
+### Owner: Candy
+### TS13 - Product Catalog
+### US05 - Minimum Threshold
+
+@baseUrl = http://localhost:5000/api
+
+### E07 - Listar todos los productos
+GET {{baseUrl}}/productos
+
+### E07 - Filtrar productos por sensor
+GET {{baseUrl}}/productos?sensorId=1
+
+### E08 - Consultar producto por ID
+GET {{baseUrl}}/productos/1
+
+### E09 - Registrar un producto
+POST {{baseUrl}}/productos
+Content-Type: application/json
+
+{
+  "nombre": "Lentils 500 g",
+  "sku": "LENT-500G",
+  "categoria": "Grocery",
+  "pesoUnitario": 0.5,
+  "precioVenta": 6.5,
+  "costoCompra": 4.9,
+  "proveedorHabitual": "Fresh Foods Co.",
+  "umbralMinimo": 5,
+  "capacidadMaxima": 60
+}
+
+### E09 - Validar un producto incorrecto
+### Respuesta esperada: 400 INVALID_PRODUCT
+POST {{baseUrl}}/productos
+Content-Type: application/json
+
+{
+  "nombre": "",
+  "categoria": "Grocery",
+  "pesoUnitario": 0,
+  "umbralMinimo": 500,
+  "capacidadMaxima": 50
+}
+
+### E10 - Actualizar precios de un producto
+PUT {{baseUrl}}/productos/1
+Content-Type: application/json
+
+{
+  "precioVenta": 8.5,
+  "costoCompra": 6.8
+}
+
+### E11 - Cambiar umbral minimo
+PUT {{baseUrl}}/sensores/1/umbral
+Content-Type: application/json
+
+{
+  "umbralMinimo": 6
+}
+
+### E11 - Umbral superior a la capacidad
+### Respuesta esperada: 422 THRESHOLD_EXCEEDS_CAPACITY
+PUT {{baseUrl}}/sensores/1/umbral
+Content-Type: application/json
+
+{
+  "umbralMinimo": 500
+}
