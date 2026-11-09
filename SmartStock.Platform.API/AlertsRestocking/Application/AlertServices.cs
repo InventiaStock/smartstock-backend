@@ -225,9 +225,25 @@ public interface IAlertQueryService
     Task<IReadOnlyList<AlertResource>> ListAsync();
 }
 
+public record NotifyLowStockCommand(long? ProductId);
+
+public record ChannelChange(long Id, bool Active);
+
+public record UpdateChannelsCommand(
+    IReadOnlyList<ChannelChange> Changes);
+
+public record NotificationSentResource(bool Sent, DateTime At);
+
+
 public interface INotificationService
 {
+    Task<NotificationSentResource> HandleAsync(
+        NotifyLowStockCommand command);
+
     Task<IReadOnlyList<ChannelResource>> ListChannelsAsync();
+
+    Task<IReadOnlyList<ChannelResource>> HandleAsync(
+        UpdateChannelsCommand command);
 }
 
 public class AlertQueryService(
@@ -295,10 +311,35 @@ public class AlertQueryService(
 }
 
 public class NotificationService(
+    IAlertRepository alerts,
+    IProductCatalogFacade catalog,
     INotificationChannelRepository channels,
+    INotificationDispatcher dispatcher,
     ICurrentUser currentUser,
     IUnitOfWork unitOfWork) : INotificationService
 {
+    public async Task<NotificationSentResource> HandleAsync(
+        NotifyLowStockCommand command)
+    {
+        var alert = command.ProductId is { } id
+            ? await alerts.FindActiveByProductAsync(id)
+            : null;
+
+        if (alert is null)
+            throw DomainException.NotFound("ALERT_NOT_FOUND");
+
+        var product = await catalog.FindByIdAsync(alert.ProductId);
+
+        await dispatcher.NotifyAsync(
+            alert,
+            product?.Name ?? string.Empty,
+            product?.MinThreshold ?? 0);
+
+        await unitOfWork.CompleteAsync();
+
+        return new NotificationSentResource(true, Clock.UtcNow);
+    }
+
     public async Task<IReadOnlyList<ChannelResource>> ListChannelsAsync()
     {
         var list = await channels.ListAsync();
@@ -318,10 +359,41 @@ public class NotificationService(
             list = await channels.ListAsync();
         }
 
-        return list.Select(channel => new ChannelResource(
+        return list.Select(ToResource).ToList();
+    }
+
+    public async Task<IReadOnlyList<ChannelResource>> HandleAsync(
+        UpdateChannelsCommand command)
+    {
+        var list = await channels.ListAsync();
+
+        var next = list.ToDictionary(
+            channel => channel.Id,
+            channel => channel.Active);
+
+        foreach (var change in command.Changes)
+        {
+            if (next.ContainsKey(change.Id))
+                next[change.Id] = change.Active;
+        }
+
+        // At least one channel must stay active.
+        if (!next.Values.Any(active => active))
+            throw DomainException.Unprocessable("AT_LEAST_ONE_CHANNEL");
+
+        foreach (var channel in list)
+            channel.SetActive(next[channel.Id]);
+
+        await unitOfWork.CompleteAsync();
+
+        return list.Select(ToResource).ToList();
+    }
+
+    private static ChannelResource ToResource(
+        NotificationChannel channel) =>
+        new(
             channel.Id,
             channel.Channel,
             channel.Destination,
-            channel.Active)).ToList();
-    }
+            channel.Active);
 }
