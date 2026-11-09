@@ -1,0 +1,53 @@
+### Owner: Ruth  ·  US04 US06 TS01 TS05 sensors, US15 US25 analytics
+@baseUrl = http://localhost:5000/api
+
+### US06 sensors with their state
+GET {{baseUrl}}/sensores
+
+### One sensor
+GET {{baseUrl}}/sensores/1
+
+### TS05 state (online if the last reading is at most 5 minutes old, R11)
+GET {{baseUrl}}/sensores/1/estado
+
+### TS01 reading from the microcontroller (no token) -> 201 { "id": 8 }
+POST {{baseUrl}}/sensores/1/lecturas
+Content-Type: application/json
+
+{ "peso": 2.0 }
+
+### Sensor that does not exist -> 404 SENSOR_NOT_FOUND
+POST {{baseUrl}}/sensores/999/lecturas
+Content-Type: application/json
+
+{ "peso": 2.0 }
+
+### Negative weight -> 400 INVALID_WEIGHT
+POST {{baseUrl}}/sensores/1/lecturas
+Content-Type: application/json
+
+{ "peso": -3 }
+
+### Reading far from the registered stock -> creates a DISCREPANCY alert (R20)
+POST {{baseUrl}}/sensores/3/lecturas
+Content-Type: application/json
+
+{ "peso": 6.2 }
+
+### US04 link the free sensor 4 to the Sugar product 4
+POST {{baseUrl}}/sensores/vincular
+Content-Type: application/json
+
+{ "sensorId": 4, "productoId": 4 }
+
+### Sensor 1 already has a product -> 409 SENSOR_IN_USE (R9)
+POST {{baseUrl}}/sensores/vincular
+Content-Type: application/json
+
+{ "sensorId": 1, "productoId": 5 }
+
+### US15 dashboard
+GET {{baseUrl}}/dashboard
+
+### US25 report of the month
+GET {{baseUrl}}/reportes?desde=2026-11-01&hasta=2026-11-30
