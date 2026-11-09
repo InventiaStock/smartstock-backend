@@ -16,6 +16,22 @@ public static class AlertsRestockingModule
         services.AddScoped<IAlertQueryService, AlertQueryService>();
         services.AddScoped<INotificationService, NotificationService>();
 
+        if (configuration["Notifications:EmailProvider"] == "smtp")
+        {
+            services.Configure<SmtpSettings>(
+                configuration.GetSection("Smtp"));
+
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
+        }
+
+        if (configuration["Notifications:WhatsAppProvider"] == "twilio")
+        {
+            services.Configure<TwilioSettings>(
+                configuration.GetSection("Twilio"));
+
+            services.AddHttpClient<IWhatsAppSender, TwilioWhatsAppSender>();
+        }
+
         return services;
     }
 }

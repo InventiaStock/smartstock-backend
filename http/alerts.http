@@ -1,4 +1,4 @@
-### Owner: Leo — Wave 1
+### Owner: Leo — Waves 1 and 2
 @baseUrl = http://localhost:5000/api
 
 ### E30 — List active alerts and alerts resolved in the last 24 hours
@@ -8,3 +8,41 @@ Accept: application/json
 ### E31 — List notification channels
 GET {{baseUrl}}/canales-notificacion
 Accept: application/json
+
+### E32 - Update notification channels
+PUT {{baseUrl}}/canales-notificacion
+Content-Type: application/json
+Accept: application/json
+
+[
+  { "id": 1, "activo": true },
+  { "id": 2, "activo": false }
+]
+
+### E32 - Reject disabling all channels (expected: 422)
+PUT {{baseUrl}}/canales-notificacion
+Content-Type: application/json
+Accept: application/json
+
+[
+  { "id": 1, "activo": false },
+  { "id": 2, "activo": false }
+]
+
+### E33 - Notify product with an active alert
+POST {{baseUrl}}/notificaciones/stock-bajo
+Content-Type: application/json
+Accept: application/json
+
+{
+  "productoId": 1
+}
+
+### E33 - Product without an active alert (expected: 404)
+POST {{baseUrl}}/notificaciones/stock-bajo
+Content-Type: application/json
+Accept: application/json
+
+{
+  "productoId": 4
+}
