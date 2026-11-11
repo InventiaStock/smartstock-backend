@@ -55,6 +55,7 @@ public class TwilioSettings
     public string AccountSid { get; set; } = string.Empty;
     public string AuthToken { get; set; } = string.Empty;
     public string From { get; set; } = "whatsapp:+14155238886";
+    public string ContentSid { get; set; } = string.Empty;
 }
 
 public class TwilioWhatsAppSender(
@@ -80,13 +81,19 @@ public class TwilioWhatsAppSender(
             new System.Net.Http.Headers.AuthenticationHeaderValue(
                 "Basic", credentials);
 
-        request.Content = new System.Net.Http.FormUrlEncodedContent(
-            new Dictionary<string, string>
-            {
-                ["From"] = settings.From,
-                ["To"] = $"whatsapp:{phone}",
-                ["Body"] = text
-            });
+        var form = new Dictionary<string, string>
+        {
+            ["From"] = settings.From,
+            ["To"] = $"whatsapp:{phone}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(settings.ContentSid))
+            form["ContentSid"] = settings.ContentSid;
+        else
+            form["Body"] = text;
+
+        request.Content =
+            new System.Net.Http.FormUrlEncodedContent(form);
 
         using var response = await http.SendAsync(request);
         response.EnsureSuccessStatusCode();
