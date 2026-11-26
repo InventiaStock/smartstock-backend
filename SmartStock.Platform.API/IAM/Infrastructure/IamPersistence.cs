@@ -48,7 +48,11 @@ public class UserRepository(AppDbContext context) : BaseRepository<User>(context
 }
 
 public class PasswordResetRepository(AppDbContext context)
-    : BaseRepository<PasswordReset>(context), IPasswordResetRepository { }
+    : BaseRepository<PasswordReset>(context), IPasswordResetRepository
+{
+    public Task<PasswordReset?> FindByTokenHashAsync(string tokenHash) =>
+        Context.Set<PasswordReset>().FirstOrDefaultAsync(reset => reset.TokenHash == tokenHash);
+}
 
 /// <summary>Demo accounts of the Fake API: store.owner@email.com and bodega.owner@email.com (Secret123).</summary>
 public class IamDemoSeeder : IDemoSeeder
