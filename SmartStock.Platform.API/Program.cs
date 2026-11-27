@@ -24,7 +24,7 @@ builder.Services.ConfigureHttpJsonOptions(options => WireJson.Configure(options.
 // ── Shared kernel and the six bounded contexts ──
 builder.Services.AddSharedKernel(builder.Configuration);
 builder.Services
-    .AddIamModule()
+    .AddIamModule(builder.Configuration)
     .AddProductCatalogModule()
     .AddIoTDeviceModule()
     .AddInventoryMonitoringModule()
@@ -36,8 +36,9 @@ var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get
 builder.Services.AddCors(options =>
     options.AddPolicy("Frontend", policy => policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
 
-// ── No security for now: by indication of the professor the endpoints are open (no login, no token) ──
-// (Por ahora los endpoints van abiertos: sin login ni token; el negocio es fijo, ver CurrentUser.)
+// ── Authentication (TS04). The other endpoints stay open; with a token each user works with its own business ──
+// (Los demás endpoints siguen abiertos; con token cada usuario trabaja con su propio negocio.)
+builder.Services.AddHttpContextAccessor();
 
 // ── OpenAPI documentation (English by default, per the rubric) ──
 builder.Services.AddOpenApi(options =>
@@ -59,6 +60,22 @@ var app = builder.Build();
 
 app.UseMiddleware<ApiErrorMiddleware>();   // outermost: no stack trace ever reaches the client
 app.UseCors("Frontend");
+app.UseAuthentication();
+
+// A token that is invalid or expired is rejected. Without this, the request would continue with the demo business.
+// (Un token inválido o vencido se rechaza; si no, la solicitud seguiría con el negocio demo.)
+app.Use(async (context, next) =>
+{
+    var sendsToken = context.Request.Headers.Authorization.Count > 0;
+    var isAuthRoute = context.Request.Path.StartsWithSegments("/api/auth");
+
+    if (sendsToken && !isAuthRoute && context.User.Identity?.IsAuthenticated != true)
+        throw new DomainException("UNAUTHORIZED", 401);
+
+    await next(context);
+});
+
+app.UseAuthorization();
 
 app.MapOpenApi();                // /openapi/v1.json
 app.MapScalarApiReference();     // /scalar/v1  (interactive documentation)
