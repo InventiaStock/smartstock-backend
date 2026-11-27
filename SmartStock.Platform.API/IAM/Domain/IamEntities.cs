@@ -36,6 +36,9 @@ public class User : IHasId
         PasswordHash = passwordHash;
         CreatedAt = Clock.UtcNow;
     }
+
+    public void ChangePassword(string passwordHash) => PasswordHash = passwordHash;
+
 }
 
 /// <summary>R4: the reset link expires in 24 hours. Only the hash of the token is stored.</summary>
@@ -57,6 +60,11 @@ public class PasswordReset : IHasId
         IssuedAt = Clock.UtcNow;
         ExpiresAt = IssuedAt.Add(lifetime);
     }
+    /// <summary>R4: usable only once and before it expires.</summary>
+    public bool IsUsable(DateTime now) => UsedAt is null && now < ExpiresAt;
+
+    public void MarkUsed(DateTime now) => UsedAt = now;
+
 }
 
 public interface IBusinessRepository : IBaseRepository<Business> { }
@@ -66,4 +74,7 @@ public interface IUserRepository : IBaseRepository<User>
     Task<User?> FindByEmailAsync(string email);
 }
 
-public interface IPasswordResetRepository : IBaseRepository<PasswordReset> { }
+public interface IPasswordResetRepository : IBaseRepository<PasswordReset>
+{
+    Task<PasswordReset?> FindByTokenHashAsync(string tokenHash);
+}

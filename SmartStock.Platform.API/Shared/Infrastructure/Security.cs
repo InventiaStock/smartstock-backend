@@ -1,15 +1,15 @@
 namespace SmartStock.Platform.API.Shared.Infrastructure;
 
 /// <summary>
-/// The current user of the request. By indication of the professor the endpoints are open for now
-/// (no login, no token), so every request works as ONE fixed business (id 1 by default).
-/// (Por ahora los endpoints van abiertos: toda solicitud trabaja como un negocio fijo, el id 1.)
+/// The current user of the request. With a valid token, the request works as the business of the user.
+/// Without a token it works as the default (demo) business, because the other endpoints are still open.
+/// (Con token: negocio del usuario. Sin token: negocio demo, porque los demás endpoints siguen abiertos.)
 /// </summary>
 public interface ICurrentUser
 {
     long BusinessId { get; }
 
-    /// <summary>Email of the default notification channel (Notifications:DefaultEmail).</summary>
+    /// <summary>Email of the signed-in user, or Notifications:DefaultEmail.</summary>
     string? Email { get; }
 
     /// <summary>
@@ -19,13 +19,18 @@ public interface ICurrentUser
     void UseBusiness(long businessId);
 }
 
-public class CurrentUser(IConfiguration configuration) : ICurrentUser
+public class CurrentUser(IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : ICurrentUser
 {
     private long? _businessOverride;
 
-    public long BusinessId => _businessOverride ?? configuration.GetValue("Tenant:DefaultBusinessId", 1L);
+    public long BusinessId =>
+        _businessOverride ?? TokenBusinessId() ?? configuration.GetValue("Tenant:DefaultBusinessId", 1L);
 
-    public string? Email => configuration["Notifications:DefaultEmail"];
+    public string? Email => Claim("email") ?? configuration["Notifications:DefaultEmail"];
 
     public void UseBusiness(long businessId) => _businessOverride = businessId;
+
+    private long? TokenBusinessId() => long.TryParse(Claim("business_id"), out var id) ? id : null;
+
+    private string? Claim(string type) => httpContextAccessor.HttpContext?.User.FindFirst(type)?.Value;
 }

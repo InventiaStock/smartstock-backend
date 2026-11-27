@@ -1,0 +1,50 @@
+### Authentication requests (TS04, US01 to US03). Test data only. (Solo datos de prueba.)
+@baseUrl = http://localhost:5000/api
+@email = qa.owner@example.com
+@password = TestOnly-Pass1
+
+### Register -> 201 session (a second run answers 409)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "businessName": "QA Test Store", "email": "{{email}}", "password": "{{password}}", "businessType": "bodega" }
+
+### Same email again -> 409 EMAIL_TAKEN (R1)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "businessName": "QA Test Store", "email": "{{email}}", "password": "{{password}}", "businessType": "bodega" }
+
+### Missing data -> 400 INCOMPLETE
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "email": "{{email}}" }
+
+### Login -> 200 session
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "{{email}}", "password": "{{password}}" }
+
+### Wrong password -> 401 INVALID_CREDENTIALS (R3: never says which field failed)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "{{email}}", "password": "wrong-password" }
+
+### Forgot password -> 200, same answer for an unknown email (R4)
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{ "email": "{{email}}" }
+
+### Reset with an invalid token -> 400 INVALID_RESET_TOKEN
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{ "token": "not-a-real-token", "password": "{{password}}" }
+
+### Invalid session token -> 401 UNAUTHORIZED (it must NOT show demo data)
+GET {{baseUrl}}/productos
+Authorization: Bearer invalid-token

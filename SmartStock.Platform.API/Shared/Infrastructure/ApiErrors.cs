@@ -19,6 +19,8 @@ public static class ErrorMessages
         ["INVALID_CREDENTIALS"] = ("The credentials are incorrect.", "Las credenciales son incorrectas."),
         ["INCOMPLETE"] = ("Some required data is missing.", "Faltan datos obligatorios."),
         ["EMAIL_TAKEN"] = ("The email is already registered.", "El correo ya está registrado."),
+        ["INVALID_RESET_TOKEN"] = ("The reset link is not valid.", "El enlace de restablecimiento no es válido."),
+        ["RESET_LINK_EXPIRED"] = ("The reset link has expired.", "El enlace de restablecimiento expiró."),
         ["PRODUCT_NOT_FOUND"] = ("The product does not exist.", "El producto no existe."),
         ["NO_SALE_PRICE"] = ("The product has no sale price.", "El producto no tiene precio de venta."),
         ["INVALID_QUANTITY"] = ("The quantity must be a whole number greater than zero.", "La cantidad debe ser un entero mayor que cero."),
